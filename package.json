@@ -1,0 +1,41 @@
+{
+  "name": "crm-system",
+  "version": "0.1.0",
+  "description": "Comprehensive CRM System with Web, Mobile, and Desktop Apps",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "web",
+    "mobile",
+    "desktop",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "backend:dev": "cd backend && npm run dev",
+    "web:dev": "cd web && npm run dev",
+    "mobile:dev": "cd mobile && npm run start",
+    "desktop:dev": "cd desktop && npm run dev",
+    "db:migrate": "cd backend && npx prisma migrate dev",
+    "db:reset": "cd backend && npx prisma migrate reset",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

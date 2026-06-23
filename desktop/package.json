@@ -1,0 +1,29 @@
+{
+  "name": "crm-desktop",
+  "version": "0.1.0",
+  "description": "Tauri + React desktop app for CRM System",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@tauri-apps/api": "^1.5.0",
+    "axios": "^1.6.5",
+    "zustand": "^4.4.1",
+    "@tanstack/react-query": "^5.32.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.5.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "react-router-dom": "^6.20.0"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@crm/shared",
+  "version": "0.1.0",
+  "description": "Shared types and utilities for CRM System",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "typescript": "^5.3.3"
+  }
+}
