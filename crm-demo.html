@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM System - Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; }
+        .badge-new { @apply bg-blue-100 text-blue-800; }
+        .badge-contacted { @apply bg-yellow-100 text-yellow-800; }
+        .badge-qualified { @apply bg-green-100 text-green-800; }
+        .badge-converted { @apply bg-emerald-100 text-emerald-800; }
+        .badge-lost { @apply bg-red-100 text-red-800; }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body class="bg-gray-50" id="app">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="w-16 h-16 mx-auto mb-4 bg-blue-600 rounded-full flex items-center justify-center">
+                <svg class="w-8 h-8 text-white animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.343a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 100-2h-1a1 1 0 100 2h1zM15.657 14.657a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM11 17a1 1 0 102 0v-1a1 1 0 10-2 0v1zM5.343 15.657a1 1 0 00-1.414 1.414l.707.707a1 1 0 001.414-1.414l-.707-.707zM2 10a1 1 0 100 2h1a1 1 0 100-2H2zM5.343 4.343a1 1 0 001.414-1.414L6.05 2.222a1 1 0 00-1.414 1.414l.707.707z"></path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">CRM System</h2>
+            <p class="text-gray-600">Đang khởi động demo...</p>
+        </div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="hidden min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white rounded-lg shadow-xl p-8">
+            <div class="text-center mb-8">
+                <div class="w-12 h-12 mx-auto mb-4 bg-blue-600 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900">CRM System</h1>
+                <p class="text-gray-600 mt-2">Quản lý khách hàng chuyên nghiệp</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="loginEmail" value="admin@example.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="admin@example.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu</label>
+                    <input type="password" id="loginPassword" value="Admin@123456" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="••••••••">
+                </div>
+                <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition">
+                    Đăng Nhập
+                </button>
+            </div>
+
+            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800 font-medium mb-2">Tài khoản Demo:</p>
+                <div class="text-xs text-blue-700 space-y-1">
+                    <p>👤 Admin: admin@example.com / Admin@123456</p>
+                    <p>👤 Manager: manager@example.com / Manager@123456</p>
+                    <p>👤 Sales: sales1@example.com / Sales@123456</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="mainApp" class="hidden min-h-screen flex">
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-gray-900 text-white p-6 shadow-lg">
+            <div class="mb-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-sm font-bold">CRM</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-white">CRM System</p>
+                        <p class="text-xs text-gray-400">v1.0.0 Demo</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="space-y-2">
+                <button onclick="showPage('dashboard')" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 transition flex items-center gap-3 active:bg-blue-600 font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 16l-7-4m0 0V5m7 4l7-4m0 0v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9m9 16l7-4"></path></svg>
+                    📊 Dashboard
+                </button>
+                <button onclick="showPage('leads')" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 transition flex items-center gap-3 font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    🎯 Khách hàng tiềm năng
+                </button>
+                <button onclick="showPage('deals')" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 transition flex items-center gap-3 font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    💼 Thương vụ
+                </button>
+                <button onclick="showPage('tasks')" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 transition flex items-center gap-3 font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    ✓ Công việc
+                </button>
+            </nav>
+
+            <div class="border-t border-gray-700 pt-6 mt-6">
+                <div class="flex items-center gap-3 px-4 py-3 bg-gray-800 rounded-lg">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm font-bold">A</div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-white" id="userName">Admin User</p>
+                        <p class="text-xs text-gray-400">ADMIN</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-full mt-4 px-4 py-2 text-red-400 hover:bg-gray-800 rounded-lg transition text-sm font-medium">
+                    Đăng Xuất
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- TOP BAR -->
+            <div class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-sm">
+                <h2 id="pageTitle" class="text-2xl font-bold text-gray-900">Dashboard</h2>
+                <div class="text-sm text-gray-600">
+                    <span id="currentTime">12:34</span> • <span id="currentDate">24/06/2026</span>
+                </div>
+            </div>
+
+            <!-- PAGES CONTENT -->
+            <div class="flex-1 overflow-auto bg-gray-50">
+                <!-- DASHBOARD PAGE -->
+                <div id="dashboardPage" class="p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <p class="text-gray-600 text-sm font-medium mb-2">Khách Hàng Tiềm Năng</p>
+                            <p class="text-3xl font-bold text-gray-900">6</p>
+                            <p class="text-xs text-green-600 mt-2">📈 +2 tuần này</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <p class="text-gray-600 text-sm font-medium mb-2">Thương Vụ Mở</p>
+                            <p class="text-3xl font-bold text-gray-900">2</p>
+                            <p class="text-xs text-blue-600 mt-2">💰 $550K giá trị</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <p class="text-gray-600 text-sm font-medium mb-2">Công Việc Chưa Xong</p>
+                            <p class="text-3xl font-bold text-gray-900">2</p>
+                            <p class="text-xs text-orange-600 mt-2">⏱️ Sắp đến hạn</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <p class="text-gray-600 text-sm font-medium mb-2">Tỉ Lệ Chuyển Đổi</p>
+                            <p class="text-3xl font-bold text-gray-900">33%</p>
+                            <p class="text-xs text-purple-600 mt-2">📊 1 lead đã chuyển</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Leads theo Trạng Thái</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 flex-1">
+                                        <span class="text-sm font-medium text-gray-700">NEW (Mới)</span>
+                                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-blue-600 h-2 rounded-full" style="width: 33%"></div>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-900">2</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 flex-1">
+                                        <span class="text-sm font-medium text-gray-700">CONTACTED (Đã liên hệ)</span>
+                                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-yellow-600 h-2 rounded-full" style="width: 17%"></div>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-900">1</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 flex-1">
+                                        <span class="text-sm font-medium text-gray-700">QUALIFIED (Xác nhận)</span>
+                                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-green-600 h-2 rounded-full" style="width: 17%"></div>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-900">1</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 flex-1">
+                                        <span class="text-sm font-medium text-gray-700">CONVERTED (Đã chuyển)</span>
+                                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-emerald-600 h-2 rounded-full" style="width: 17%"></div>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-900">1</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 flex-1">
+                                        <span class="text-sm font-medium text-gray-700">LOST (Mất)</span>
+                                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-red-600 h-2 rounded-full" style="width: 16%"></div>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-900">1</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Hoạt Động Gần Đây</h3>
+                            <div class="space-y-4 text-sm">
+                                <div class="border-l-4 border-blue-600 pl-4">
+                                    <p class="font-medium text-gray-900">Lead Mới: Tôn Nữ Tây</p>
+                                    <p class="text-gray-600 text-xs mt-1">2 phút trước</p>
+                                </div>
+                                <div class="border-l-4 border-yellow-600 pl-4">
+                                    <p class="font-medium text-gray-900">Cập nhật: Lê Marketing Manager</p>
+                                    <p class="text-gray-600 text-xs mt-1">15 phút trước</p>
+                                </div>
+                                <div class="border-l-4 border-green-600 pl-4">
+                                    <p class="font-medium text-gray-900">Thương vụ: Enterprise License</p>
+                                    <p class="text-gray-600 text-xs mt-1">1 giờ trước</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LEADS PAGE -->
+                <div id="leadsPage" class="hidden p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Quản Lý Khách Hàng Tiềm Năng</h2>
+                        <button onclick="showPage('createLead')" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition">
+                            + Thêm Lead
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm</label>
+                                <input type="text" id="searchLead" placeholder="Tên, email, công ty..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" onkeyup="filterLeads()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+                                <select id="statusFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" onchange="filterLeads()">
+                                    <option value="">Tất cả</option>
+                                    <option value="NEW">Mới</option>
+                                    <option value="CONTACTED">Đã liên hệ</option>
+                                    <option value="QUALIFIED">Xác nhận</option>
+                                    <option value="CONVERTED">Đã chuyển</option>
+                                    <option value="LOST">Mất</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nguồn</label>
+                                <select id="sourceFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" onchange="filterLeads()">
+                                    <option value="">Tất cả</option>
+                                    <option value="WEBSITE">Website</option>
+                                    <option value="FACEBOOK_ADS">Facebook Ads</option>
+                                    <option value="GOOGLE_ADS">Google Ads</option>
+                                    <option value="LINKEDIN">LinkedIn</option>
+                                    <option value="REFERRAL">Giới thiệu</option>
+                                    <option value="MANUAL">Nhập tay</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Tên</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Công ty</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Trạng thái</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Điểm số</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadsTableBody" class="divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- CREATE LEAD PAGE -->
+                <div id="createLeadPage" class="hidden p-8">
+                    <div class="max-w-2xl mx-auto">
+                        <button onclick="showPage('leads')" class="text-blue-600 hover:text-blue-700 mb-6 flex items-center gap-2">
+                            ← Quay lại danh sách
+                        </button>
+
+                        <div class="bg-white rounded-lg shadow p-8">
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2">Tạo Lead Mới</h1>
+                            <p class="text-gray-600 mb-6">Nhập thông tin khách hàng tiềm năng</p>
+
+                            <form id="createLeadForm" onsubmit="handleCreateLead(event)" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Tên <span class="text-red-600">*</span></label>
+                                        <input type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Nguyễn">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Họ <span class="text-red-600">*</span></label>
+                                        <input type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Văn A">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                        <input type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="user@example.com">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                                        <input type="tel" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="0912345678">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Công ty</label>
+                                        <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="ABC Corporation">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Chức vụ</label>
+                                        <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="CEO, Sales Manager...">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nguồn <span class="text-red-600">*</span></label>
+                                    <select required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                        <option value="">Chọn nguồn</option>
+                                        <option value="WEBSITE">Website</option>
+                                        <option value="FACEBOOK_ADS">Facebook Ads</option>
+                                        <option value="GOOGLE_ADS">Google Ads</option>
+                                        <option value="LINKEDIN">LinkedIn</option>
+                                        <option value="REFERRAL">Giới thiệu</option>
+                                        <option value="MANUAL">Nhập tay</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Ghi chú</label>
+                                    <textarea rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Thêm ghi chú về lead này..."></textarea>
+                                </div>
+
+                                <div class="flex gap-4 pt-4 border-t border-gray-200">
+                                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition">
+                                        Tạo Lead
+                                    </button>
+                                    <button type="button" onclick="showPage('leads')" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-medium py-2 px-4 rounded-lg transition">
+                                        Hủy
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DEALS PAGE -->
+                <div id="dealsPage" class="hidden p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Thương Vụ</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900">Enterprise License for Tech Solutions</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Tech Solutions Inc</p>
+                                </div>
+                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">PROPOSAL</span>
+                            </div>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Giá trị:</span>
+                                    <span class="font-bold text-gray-900">$500,000 USD</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Xác suất:</span>
+                                    <span class="font-bold text-gray-900">80%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Dự kiến đóng:</span>
+                                    <span class="font-bold text-gray-900">30/07/2026</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900">Startup Package</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Startup Việt Nam</p>
+                                </div>
+                                <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">NEGOTIATION</span>
+                            </div>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Giá trị:</span>
+                                    <span class="font-bold text-gray-900">$50,000 USD</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Xác suất:</span>
+                                    <span class="font-bold text-gray-900">60%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Dự kiến đóng:</span>
+                                    <span class="font-bold text-gray-900">08/07/2026</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-600 h-2 rounded-full" style="width: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TASKS PAGE -->
+                <div id="tasksPage" class="hidden p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Công Việc</h2>
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-lg shadow p-6 flex items-start gap-4">
+                            <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 cursor-pointer">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900">Follow up with Tech Solutions</h3>
+                                <p class="text-sm text-gray-600 mt-1">Call to discuss proposal</p>
+                                <div class="flex gap-4 mt-3">
+                                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">CAO</span>
+                                    <span class="text-xs text-gray-600">📅 26/06/2026</span>
+                                    <span class="text-xs text-gray-600">👤 Nguyễn Bán Hàng 1</span>
+                                </div>
+                            </div>
+                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-sm font-medium">ĐANG XỬ LÝ</span>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6 flex items-start gap-4">
+                            <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 cursor-pointer" checked>
+                            <div class="flex-1 opacity-60">
+                                <h3 class="font-bold text-gray-900 line-through">Prepare demo for Startup</h3>
+                                <p class="text-sm text-gray-600 mt-1">Prepare customized demo</p>
+                                <div class="flex gap-4 mt-3">
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">TRUNG BÌNH</span>
+                                    <span class="text-xs text-gray-600">📅 29/06/2026</span>
+                                    <span class="text-xs text-gray-600">👤 Phạm Bán Hàng 2</span>
+                                </div>
+                            </div>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-medium">HOÀN THÀNH</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const mockLeads = [
+            { id: 1, firstName: 'Tôn', lastName: 'Nữ Tây', email: 'ton.nuytay@techcorp.com', phone: '0912345678', company: 'Tech Solutions Inc', jobTitle: 'CTO', source: 'WEBSITE', status: 'NEW', score: 85 },
+            { id: 2, firstName: 'Lê', lastName: 'Marketing Manager', email: 'le.marketing@startup.vn', phone: '0923456789', company: 'Startup Việt Nam', jobTitle: 'Marketing Manager', source: 'FACEBOOK_ADS', status: 'CONTACTED', score: 65 },
+            { id: 3, firstName: 'Hoàng', lastName: 'CEO', email: 'hoang.ceo@company.com', phone: '0934567890', company: 'Công Ty Lớn A', jobTitle: 'CEO', source: 'GOOGLE_ADS', status: 'QUALIFIED', score: 90 },
+            { id: 4, firstName: 'Bùi', lastName: 'Project Manager', email: 'bui.pm@midsize.com', phone: '0945678901', company: 'Công Ty Vừa B', jobTitle: 'Project Manager', source: 'LINKEDIN', status: 'NURTURING', score: 55 },
+            { id: 5, firstName: 'Vũ', lastName: 'Decision Maker', email: 'vu.decision@enterprise.com', phone: '0956789012', company: 'Doanh Nghiệp Lớn C', jobTitle: 'SVP', source: 'REFERRAL', status: 'CONVERTED', score: 100 },
+            { id: 6, firstName: 'Dương', lastName: 'Department Head', email: 'duong.head@smallco.com', phone: '0967890123', company: 'Công Ty Nhỏ D', jobTitle: 'Department Head', source: 'MANUAL', status: 'LOST', score: 20 },
+        ];
+
+        const users = {
+            'admin@example.com': { name: 'Admin User', role: 'ADMIN' },
+            'manager@example.com': { name: 'Trần Quản Lý', role: 'MANAGER' },
+            'sales1@example.com': { name: 'Nguyễn Bán Hàng 1', role: 'USER' },
+        };
+
+        let currentUser = null;
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('vi-VN');
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                alert('Vui lòng nhập email và mật khẩu');
+                return;
+            }
+
+            if (users[email]) {
+                currentUser = { email, ...users[email] };
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                showPage('dashboard');
+            } else {
+                alert('Tài khoản không hợp lệ. Hãy sử dụng tài khoản demo.');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('loginEmail').value = 'admin@example.com';
+            document.getElementById('loginPassword').value = 'Admin@123456';
+        }
+
+        function showPage(page) {
+            // Hide all pages
+            document.querySelectorAll('[id$="Page"]').forEach(el => el.classList.add('hidden'));
+
+            // Remove active state from nav items
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-blue-600', 'text-white'));
+
+            // Show selected page
+            const pageId = page + 'Page';
+            const pageEl = document.getElementById(pageId);
+            if (pageEl) {
+                pageEl.classList.remove('hidden');
+            }
+
+            // Update nav item
+            const navButtons = document.querySelectorAll('.nav-item');
+            navButtons.forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(page)) {
+                    btn.classList.add('bg-blue-600', 'text-white');
+                }
+            });
+
+            // Update page title
+            const titles = {
+                'dashboard': '📊 Dashboard',
+                'leads': '🎯 Khách hàng tiềm năng',
+                'deals': '💼 Thương vụ',
+                'tasks': '✓ Công việc',
+                'createLead': '🎯 Tạo Lead Mới'
+            };
+            document.getElementById('pageTitle').textContent = titles[page] || 'CRM System';
+
+            if (page === 'leads') {
+                renderLeadsTable();
+            }
+        }
+
+        function renderLeadsTable() {
+            const tbody = document.getElementById('leadsTableBody');
+            tbody.innerHTML = mockLeads.map(lead => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">${lead.firstName} ${lead.lastName}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${lead.email}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${lead.company}</td>
+                    <td class="px-6 py-4 text-sm">
+                        <span class="badge badge-${lead.status.toLowerCase()}">${getStatusLabel(lead.status)}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-16 bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${lead.score}%"></div>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900">${lead.score}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        <button onclick="deleteLead(${lead.id})" class="text-red-600 hover:text-red-800 font-medium">Xóa</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'NEW': 'Mới',
+                'CONTACTED': 'Đã liên hệ',
+                'QUALIFIED': 'Xác nhận',
+                'NURTURING': 'Nuôi dưỡng',
+                'CONVERTED': 'Đã chuyển',
+                'LOST': 'Mất'
+            };
+            return labels[status] || status;
+        }
+
+        function filterLeads() {
+            const searchTerm = document.getElementById('searchLead').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const sourceFilter = document.getElementById('sourceFilter').value;
+
+            const filtered = mockLeads.filter(lead => {
+                const matchSearch = !searchTerm ||
+                    lead.firstName.toLowerCase().includes(searchTerm) ||
+                    lead.lastName.toLowerCase().includes(searchTerm) ||
+                    lead.email.toLowerCase().includes(searchTerm) ||
+                    lead.company.toLowerCase().includes(searchTerm);
+
+                const matchStatus = !statusFilter || lead.status === statusFilter;
+                const matchSource = !sourceFilter || lead.source === sourceFilter;
+
+                return matchSearch && matchStatus && matchSource;
+            });
+
+            const tbody = document.getElementById('leadsTableBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-600">Không tìm thấy lead nào</td></tr>';
+            } else {
+                tbody.innerHTML = filtered.map(lead => `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">${lead.firstName} ${lead.lastName}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${lead.email}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${lead.company}</td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="badge badge-${lead.status.toLowerCase()}">${getStatusLabel(lead.status)}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-16 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: ${lead.score}%"></div>
+                                </div>
+                                <span class="text-sm font-medium text-gray-900">${lead.score}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <button onclick="deleteLead(${lead.id})" class="text-red-600 hover:text-red-800 font-medium">Xóa</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function deleteLead(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa lead này?')) {
+                const index = mockLeads.findIndex(l => l.id === id);
+                if (index > -1) {
+                    mockLeads.splice(index, 1);
+                    renderLeadsTable();
+                    alert('Lead đã được xóa thành công!');
+                }
+            }
+        }
+
+        function handleCreateLead(event) {
+            event.preventDefault();
+            const form = event.target;
+            const inputs = form.querySelectorAll('input, select, textarea');
+
+            const newLead = {
+                id: Math.max(...mockLeads.map(l => l.id)) + 1,
+                firstName: inputs[0].value,
+                lastName: inputs[1].value,
+                email: inputs[2].value,
+                phone: inputs[3].value,
+                company: inputs[4].value,
+                jobTitle: inputs[5].value,
+                source: inputs[6].value,
+                status: 'NEW',
+                score: 0
+            };
+
+            mockLeads.push(newLead);
+            alert('Lead đã được tạo thành công!');
+            form.reset();
+            showPage('leads');
+        }
+
+        // Initialize
+        setTimeout(() => {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            updateClock();
+            setInterval(updateClock, 60000);
+        }, 1500);
+    </script>
+</body>
+</html>
